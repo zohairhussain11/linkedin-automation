@@ -1,0 +1,33 @@
+name: Generate Daily LinkedIn Post
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install Dependencies
+        run: npm install
+      
+      - name: Generate Daily Post
+        run: npm run generate-once
+      
+      - name: Upload Generated Posts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: daily-post-${{ github.run_number }}
+          path: generated_posts/
+          retention-days: 30
